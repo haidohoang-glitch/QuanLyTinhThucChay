@@ -1,0 +1,22 @@
+# Table: `ThucChayAdmarket_ADX_CPC_NhanHang`
+
+---
+
+## Columns
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `contract_number` | `NVARCHAR(100)` nullable |  |
+| `dmnhanhang_id` | `NVARCHAR(100)` nullable |  |
+| `total_click` | `NVARCHAR(100)` nullable |  |
+| `total_view` | `NVARCHAR(100)` nullable |  |
+| `money` | `NVARCHAR(100)` nullable |  |
+| `promotion` | `NVARCHAR(100)` nullable |  |
+| `is_noibo` | `NVARCHAR(100)` nullable |  |
+| `user_id` | `NVARCHAR(100)` nullable |  |
+| `username` | `NVARCHAR(100)` nullable |  |
+| `DmSanPhamREF` | `NVARCHAR(100)` nullable |  |
+| `TenSanPham` | `NVARCHAR(100)` nullable |  |
+| `NgayThucHien` | `DATETIME` nullable |  |
+| `createdBy` | `NVARCHAR(100)` nullable |  |
+| `createdAt` | `DATETIME` nullable |  |

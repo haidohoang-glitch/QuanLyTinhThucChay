@@ -1,0 +1,168 @@
+# Stored Procedure: `ThucChay_UpDateThucChayDaTinh_DonViBai_BySoHopDong`
+
+- **Loại**: SQL_STORED_PROCEDURE
+- **Ngày tạo**: 2021-03-03 16:24:27.567000
+- **Ngày sửa cuối**: 2021-07-23 17:39:35.367000
+
+## Parameters
+
+| Parameter | Type | Output |
+|-----------|------|--------|
+| `@StartDate` | `datetime(8)` | No |
+| `@EndDate` | `datetime(8)` | No |
+| `@NgayGhiNhanThucChay` | `datetime(8)` | No |
+| `@pSoHopDong` | `nvarchar(200)` | No |
+
+## Definition (Source Code)
+
+```sql
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+
+
+/*HAM THUC HIEN XU LY CHO TRUONG HOP DA QUA THOI GIAN CHAY MA CHUA TINH THUC CHAY CHO HOP DONG CPM DON VI BAI*/
+/*
+
+EXEC [dbo].[ThucChay_UpDateThucChayDaTinh_DonViBai_BySoHopDong] 
+        '2021-01-20' ,
+        '2021-02-28' ,
+        '2021-03-25' ,
+        'QC5970121'
+*/
+CREATE PROCEDURE [dbo].[ThucChay_UpDateThucChayDaTinh_DonViBai_BySoHopDong] 
+	@StartDate DATETIME,
+	@EndDate DATETIME,
+	@NgayGhiNhanThucChay DATETIME,
+	@pSoHopDong NVARCHAR(100)
+AS
+BEGIN
+	DECLARE @NgayThucHien DATETIME, @Count INT =0
+	DECLARE @SoHopDong NVARCHAR(50)
+			   ,@HopDongID INT
+			   ,@HopDongChiTietREF INT
+			   ,@DmSanPhamREF INT
+			   ,@DmBannerREF INT
+			   ,@ThucChayHopDongChiTietREF INT
+
+	SET @NgayThucHien = @StartDate
+	SET @SoHopDong = @pSoHopDong
+
+	--DELETE FROM dbo.ThucChayDaTinh
+	--WHERE CONVERT(date,NgayThucHien) = @NgayGhiNhanThucChay
+	--AND NOT ( DmLoaiBannerREF IN (17,18)OR DmHinhThucQuangCao IN (13))
+	--AND DmSanPhamREF = 598
+	--AND DmHinhThucQuangCao = 5001
+	--AND DmVitriREF = 9198
+	--AND DonViTinh = N'BÀI'
+	--AND DotChayHopDong = N'CPM_DonViBai'
+	--AND SoHopDong = @SoHopDong
+
+	WHILE(@NgayThucHien <= @EndDate)
+	BEGIN
+		--THUC HIEN XOA DL THUC CHAY DONVIBAI TRUOC KHI TINH
+		DELETE FROM [dbo].[ThucChay_DonViBai_Temp]
+
+		INSERT INTO [dbo].[ThucChay_DonViBai_Temp]
+			   (
+			   ThucChayID
+			   ,[SoHopDong]
+			   ,[HopDongREF]
+			   ,[DmSanPhamREF]
+			   ,[TenSanPham]
+			   ,[DmBannerREF]
+			   ,[NgayThucHien]
+			   ,[HopDongChiTietREF]
+			   ,[ThucChayHopDongChiTietREF]
+			  )
+
+		SELECT DISTINCT 0, hd.SoHopDong,  hd.HopDongID, hd.DmSanPhamREF, hd.TenSanPham, hd.DmBannerREF
+			, @NgayThucHien AS NgayThucHien, hd.HopDongChiTietID as HopDongChiTietREF, hd.ThucChayHopDongChiTietID FROM
+		
+		(
+			SELECT hd.HopDongID, hd.SoHopDong, hdct.HopDongChiTietID
+			, hdct.DmSanPhamREF, hdct.TenSanPham, tchdct.DmBannerREF, tchdct.ThucChayHopDongChiTietID FROM
+			(
+				SELECT hd.SoHopDong, hd.HopDongID FROM dbo.HopDong hd 
+				WHERE hd.NgayDanhSoHopDong >= '2021-01-01'	AND hd.TrangThaiHopDong <> 3
+				AND hd.SoHopDong = @SoHopDong
+			)hd
+			INNER JOIN
+			(
+				SELECT hdct.HopDongFK, hdct.HopDongChiTietID, hdct.DmSanPhamREF, hdct.TenSanPham, hdct.DmViTriREF
+				, hdct.DonViTinhREF FROM dbo.HopDongChiTiet hdct 
+				WHERE hdct.DeletedStatus = 0
+				AND hdct.DmSanPhamREF = 598 AND hdct.DmViTriREF = 9198 AND hdct.DonViTinhREF = 7 --King size, Sponsor Page, Bai 
+				AND NOT (hdct.DmLoaiREF = 13 OR hdct.DmLoaiBannerREF = 18) --loai mua ngoai
+				AND hdct.DmLoaiREF = 5001 --Display ads
+			)hdct ON hd.HopDongID = hdct.HopDongFK
+			INNER JOIN (
+				SELECT tchdct.* FROM dbo.ThucChayHopDongChiTiet tchdct 
+				WHERE tchdct.DmSanPhamREF = 598
+				AND tchdct.DmHinhThucQuangCaoREF = 5001
+				AND tchdct.DeletedStatus = 0
+				AND CONVERT(DATE,tchdct.LastModifiedAt) = @NgayThucHien
+			)tchdct ON hdct.HopDongFK = tchdct.HopDongREF AND hdct.HopDongChiTietID = tchdct.HopDongChiTietREF
+			AND hdct.DmSanPhamREF = tchdct.DmSanPhamREF 
+		)hd 
+		--AND tcc.DmBannerREF = hd.DmBannerREF --theo link bai và bannerid = 0, haidh comment 2021-07-23
+
+		--THUC HIEN TINH GIA TRI THUC CHAY
+
+		--select * from  [ThucChay_DonViBai_Temp]
+
+		DECLARE Record_Cursor_DonViBai CURSOR FOR 
+		SELECT distinct [SoHopDong]
+			   ,[HopDongREF]
+			   ,[HopDongChiTietREF]
+			   ,[DmSanPhamREF]
+			   ,[DmBannerREF]
+			   ,ThucChayHopDongChiTietREF
+		  FROM	dbo.[ThucChay_DonViBai_Temp]
+		ORDER BY [HopDongREF], [HopDongChiTietREF]	
+
+		OPEN Record_Cursor_DonViBai
+
+		-- Perform the first fetch.
+		FETCH NEXT FROM Record_Cursor_DonViBai into @SoHopDong ,@HopDongID ,@HopDongChiTietREF,@DmSanPhamREF,@DmBannerREF,@ThucChayHopDongChiTietREF
+			
+		WHILE @@FETCH_STATUS = 0
+			BEGIN
+				--XAC DINH HOP DONG CHI TIET DA TINH THUC CHAY CHUA
+				--NEU CHUA TINH THUC CHAY
+				IF NOT EXISTS(
+					SELECT tcdt.HopDongChiTietREF, sum(tcdt.ThanhTienSauTrietKhauThucChay + GiaTriThayDoi) FROM dbo.ThucChayDaTinh tcdt
+					WHERE tcdt.HopDongID = @HopDongID
+					AND tcdt.HopDongChiTietREF = @HopDongChiTietREF
+					AND tcdt.SoLuongDotChayHD = @ThucChayHopDongChiTietREF
+					AND tcdt.NgayThucHien <= @NgayGhiNhanThucChay
+					GROUP BY tcdt.HopDongChiTietREF HAVING abs(sum(tcdt.ThanhTienSauTrietKhauThucChay + GiaTriThayDoi)) >1
+				)
+				BEGIN
+					--THUC HIEN TINH THUC CHAY
+					PRINT 'TINH THUC CHAY CHO TOAN BO PHAN BO'
+					EXEC [dbo].[ThucChay_InsertThucChayDaTinh_CPM_DonViBai] 
+						@NgayThucHien = @NgayGhiNhanThucChay,
+						@HopDongID = @HopDongID,
+						@HopDongChiTietREF = @HopDongChiTietREF,
+						@DmSanPhamREF = @DmSanPhamREF,
+						@DmBannerREF = @DmBannerREF,
+						@ThucChayHopDongChiTietREF = @ThucChayHopDongChiTietREF
+				END
+			FETCH NEXT FROM Record_Cursor_DonViBai into @SoHopDong ,@HopDongID ,@HopDongChiTietREF,@DmSanPhamREF,@DmBannerREF,@ThucChayHopDongChiTietREF
+			END
+
+		CLOSE Record_Cursor_DonViBai
+		DEALLOCATE Record_Cursor_DonViBai
+
+		SET @NgayThucHien = DATEADD(d,1,@NgayThucHien)
+		DELETE FROM dbo.[ThucChay_DonViBai_Temp]
+	END 
+	
+	SELECT '1'
+END
+
+
+```

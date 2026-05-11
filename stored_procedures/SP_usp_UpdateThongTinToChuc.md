@@ -1,0 +1,96 @@
+# Stored Procedure: `usp_UpdateThongTinToChuc`
+
+- **Loại**: SQL_STORED_PROCEDURE
+- **Ngày tạo**: 2013-08-20 16:13:25.977000
+- **Ngày sửa cuối**: 2014-11-19 12:16:43.690000
+
+## Parameters
+
+| Parameter | Type | Output |
+|-----------|------|--------|
+| `@ThongTinToChucID` | `int(4)` | No |
+| `@MaThongTinToChuc` | `nvarchar(100)` | No |
+| `@TenToChuc` | `nvarchar(400)` | No |
+| `@GiayPhepKinhDoanh` | `nvarchar(100)` | No |
+| `@NgayThanhLap` | `datetime(8)` | No |
+| `@NoiCapGiayPhepKinhDoanh` | `nvarchar(400)` | No |
+| `@MaSoThue` | `nvarchar(100)` | No |
+| `@DienThoai` | `nvarchar(100)` | No |
+| `@Fax` | `nvarchar(100)` | No |
+| `@Email` | `nvarchar(400)` | No |
+| `@Website` | `nvarchar(400)` | No |
+| `@DmLoaiToChucREF` | `int(4)` | No |
+| `@DiaChiREF` | `int(4)` | No |
+| `@GhiChu` | `nvarchar(8000)` | No |
+| `@Active` | `int(4)` | No |
+| `@CreatedBy` | `nvarchar(2)` | No |
+| `@CreatedAt` | `datetime(8)` | No |
+| `@LastModifiedBy` | `nvarchar(2)` | No |
+| `@LastModifiedAt` | `datetime(8)` | No |
+| `@DeletedStatus` | `int(4)` | No |
+| `@PrintStatus` | `int(4)` | No |
+| `@RecordStatus` | `int(4)` | No |
+
+## Definition (Source Code)
+
+```sql
+--=============================================
+-- Author:   Nhat Mai Quy
+-- Stored Procedure Name: [dbo].[usp_UpdateThongTinToChuc]
+-- Create Date: Monday, August 19, 2013
+-- Description: 
+--=============================================
+
+CREATE PROCEDURE [dbo].[usp_UpdateThongTinToChuc]
+	@ThongTinToChucID int,
+	@MaThongTinToChuc nvarchar(50),
+	@TenToChuc nvarchar(200),
+	@GiayPhepKinhDoanh nvarchar(50),
+	@NgayThanhLap datetime,
+	@NoiCapGiayPhepKinhDoanh nvarchar(200),
+	@MaSoThue nvarchar(50),
+	@DienThoai nvarchar(50),
+	@Fax nvarchar(50),
+	@Email nvarchar(200),
+	@Website nvarchar(200),
+	@DmLoaiToChucREF int,
+	@DiaChiREF int,
+	@GhiChu nvarchar(4000),
+	@Active int,
+	@CreatedBy nvarchar(1),
+	@CreatedAt datetime,
+	@LastModifiedBy nvarchar(1),
+	@LastModifiedAt datetime,
+	@DeletedStatus int,
+	@PrintStatus int,
+	@RecordStatus int
+AS
+
+SET NOCOUNT ON
+
+UPDATE [dbo].[ThongTinToChuc] SET
+	[MaThongTinToChuc] = @MaThongTinToChuc,
+	[TenToChuc] = @TenToChuc,
+	[GiayPhepKinhDoanh] = @GiayPhepKinhDoanh,
+	[NgayThanhLap] = @NgayThanhLap,
+	[NoiCapGiayPhepKinhDoanh] = @NoiCapGiayPhepKinhDoanh,
+	[MaSoThue] = @MaSoThue,
+	[DienThoai] = @DienThoai,
+	[Fax] = @Fax,
+	[Email] = @Email,
+	[Website] = @Website,
+	[DmLoaiToChucREF] = @DmLoaiToChucREF,
+	[DiaChiREF] = @DiaChiREF,
+	[GhiChu] = @GhiChu,
+	[Active] = @Active,
+	[LastModifiedBy] = @LastModifiedBy,
+	[LastModifiedAt] = @LastModifiedAt,
+	[DeletedStatus] = @DeletedStatus,
+	[PrintStatus] = @PrintStatus,
+	[RecordStatus] = @RecordStatus
+WHERE
+	[ThongTinToChucID] = @ThongTinToChucID
+
+--endregion
+
+```

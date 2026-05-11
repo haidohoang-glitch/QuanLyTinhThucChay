@@ -1,0 +1,374 @@
+# Stored Procedure: `Insert_DoanhSoTienVeNhanHangCore_NoiBo_History_Update`
+
+- **Loại**: SQL_STORED_PROCEDURE
+- **Ngày tạo**: 2015-06-12 10:47:00.180000
+- **Ngày sửa cuối**: 2015-06-12 10:47:00.180000
+
+## Parameters
+
+| Parameter | Type | Output |
+|-----------|------|--------|
+| `@NgayThucHien` | `datetime(8)` | No |
+| `@HopDongID_in` | `int(4)` | No |
+| `@HopDongChiTietID_in` | `int(4)` | No |
+| `@ThongTinTienVeID_in` | `int(4)` | No |
+
+## Definition (Source Code)
+
+```sql
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+CREATE PROCEDURE [dbo].[Insert_DoanhSoTienVeNhanHangCore_NoiBo_History_Update]
+	-- Add the parameters for the stored procedure here
+	@NgayThucHien DATETIME,
+	@HopDongID_in INT,
+	@HopDongChiTietID_in INT,
+	@ThongTinTienVeID_in INT
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+	DECLARE @CountNhan INT, @ChiSoSLNhanM BIGINT, @ChiSoTTNhanM BIGINT ;
+	SET @CountNhan = 0;
+	
+	DECLARE @CheckHopDongChiTietTcID INT;
+	DECLARE @SoLuongNhan INT;
+	DECLARE @ThanhTienHoaDon FLOAT ;
+	DECLARE @DsTenNhanHang NVARCHAR(200),@DmListNhanHangREF NVARCHAR(200), @DsTenNganhHang NVARCHAR(500), @DmListNganhHangREF NVARCHAR(500);
+	DECLARE @HopDongID INT ,@SoHopDong NVARCHAR(200), @TenNhanVien NVARCHAR(200), @DmNhanVienREF INT, @TenPhongBan NVARCHAR(200), @PhongBanREF INT;
+	DECLARE @TenBoPhan NVARCHAR(200), @BoPhanREF INT, @TenNhom NVARCHAR(200), @NhomREF INT, @TenKhachHang NVARCHAR(200),@DmKhachHangREF INT;
+	DECLARE @HopDongChiTietREF INT, @TenSanPham NVARCHAR(200), @DmSanPhamREF INT, @TenWebsite NVARCHAR(200), @DmWebsiteREF INT; 
+	DECLARE @DonViTinhREF INT, @DonViTinh NVARCHAR(50),@TenDangNhap NVARCHAR(50), @TenNhanHang NVARCHAR(200),@DmNhanHangREF INT ;
+	DECLARE @ChietKhau FLOAT, @DonGia FLOAT, @SoLuong BIGINT, @ThanhTien FLOAT,@TrangThaiHopDong INT ;
+	DECLARE @NgayDanhSo DATETIME, @NgayKyHopDong DATETIME,@DmMaSohopDong int, @NgayThanhToan DATETIME, @SoHoaDon NVARCHAR(50), @ThongTinTienVeID INT;
+    -- Insert statements for procedure here
+	DECLARE Record_cursor1 CURSOR FOR  
+	SELECT 
+		hdct.NhanHang,
+		hdct.DanhSachNhanHangREF,
+		hdct.TenNhomNganh,
+		hdct.DmNhomNganhREF,
+		
+		hd.HopDongID,
+		hd.SoHopDong,
+		hd.NgayDanhSoHopDong,
+		hd.NgayKyHopDong,
+		hd.TenNhanVien,
+		hd.SysNhanVienREF,
+		hd.TenPhongBan,
+		hd.DmPhongBanREF,
+		Hd.TenBoPhan,
+		hd.DmBoPhanREF,
+		hd.TenNhom,
+		hd.DmNhomREF,
+		hd.TenKhachHang,
+		hd.DmKhachHangREF,
+		hdct.HopDongChiTietID,
+		hdct.TenSanPham,
+		hdct.DmSanPhamREF,
+		hdct.TenWebsite,
+		hdct.DmWebsiteREF,
+		hdct.DonViTinhREF,
+		hdct.DonViTinh,
+		hd.TenDangNhap,
+		hdct.ChietKhau,
+		hdct.DonGia,
+		hdct.SoLuong,
+		hdct.ThanhTien,
+		hd.TrangThaiHopDong,
+		A.NgayThanhToan,
+		A.ThongTinTienVeID,
+		hd.DmMaHopDongREF
+	FROM HopDong hd
+		INNER JOIN HopDongChiTiet hdct ON hd.HopDongID = hdct.HopDongFK
+		INNER JOIN
+		(SELECT  tthd.HopDongREF,CONVERT(DATE,tthd.NgayThanhToan) AS NgayThanhToan, tthd.ThongTinTienVeID, tthd.GiaTri, tthd.DeletedStatus
+		   FROM ThongTinTienVe tthd WHERE  tthd.DeletedStatus = 0 AND tthd.ThongTinTienVeID = @ThongTinTienVeID_in) A
+		ON A.HopDongREF = hd.HopDongID
+		WHERE 1=1
+		AND hdct.DeletedStatus = 0
+		AND hd.DeletedStatus = 0
+		AND hd.TrangThaiHopDong <> 3
+				AND (SELECT SUM(ThanhTien) FROM HopDongChiTiet hdct2 WHERE hdct2.HopDongFK = hd.HopDongID AND hdct2.DeletedStatus = 0) > 0
+	    AND A.DeletedStatus = 0
+		AND [dbo].[fn_CheckIsDmLoaiHopDongNoiBo](hd.DmMaHopDongREF, @NgayThucHien) = 1
+		AND hdct.ChietKhau <> 100
+		AND hd.HopDongID = @HopDongID_in
+		AND hdct.HopDongChiTietID = @HopDongChiTietID_in
+
+	OPEN Record_cursor1  
+	 
+	FETCH NEXT FROM Record_cursor1 INTO @DsTenNhanHang, @DmListNhanHangREF,@DsTenNganhHang , @DmListNganhHangREF 
+	,@HopDongID  ,@SoHopDong, @NgayDanhSo, @NgayKyHopDong , @TenNhanVien , @DmNhanVienREF , @TenPhongBan, @PhongBanREF 
+	, @TenBoPhan , @BoPhanREF , @TenNhom , @NhomREF , @TenKhachHang ,@DmKhachHangREF 
+	, @HopDongChiTietREF , @TenSanPham , @DmSanPhamREF , @TenWebsite , @DmWebsiteREF 
+	, @DonViTinhREF , @DonViTinh,@TenDangNhap,@ChietKhau , @DonGia , @SoLuong , @ThanhTien ,@TrangThaiHopDong
+	,@NgayThanhToan,@ThongTinTienVeID,@DmMaSohopDong
+
+	WHILE @@FETCH_STATUS = 0   
+	BEGIN   
+		    SET @ThanhTienHoaDon = (SELECT dbo.fn_GetThanhTienByNgay_DoanhSoTienVeCore(@NgayThanhToan,@HopDongID,@ThongTinTienVeID,@ThanhTien))
+		    SET @DmNhanHangREF = 0
+			SET @TenNhanHang = ''
+			SET @CountNhan = 0
+			
+			SELECT @SoLuongNhan = count(a.DmNhanHang) from
+			(
+				SELECT distinct dbo.FormatString(item) DmNhanHang
+				FROM dbo.ArrayToTable(dbo.Array(@DmListNhanHangREF,','))
+			)a
+			IF @DmListNhanHangREF ='' SET @SoLuongNhan =0
+	IF(@SoLuongNhan >0)
+	BEGIN
+		    DECLARE Record_cursor2 CURSOR FOR  
+		    
+			SELECT distinct dbo.FormatString(item) DmNhanHang
+			FROM dbo.ArrayToTable(dbo.Array(@DmListNhanHangREF,','))  
+
+			OPEN Record_cursor2   
+			FETCH NEXT FROM Record_cursor2 INTO @DmNhanHangREF   
+
+			WHILE @@FETCH_STATUS = 0   
+			BEGIN   
+				    SET @CountNhan +=1;
+				    IF(@CountNhan <> @SoLuongNhan) 
+						BEGIN
+							IF(@SoLuong <> 0)
+								begin
+				    				SET @ChiSoSLNhanM =  @SoLuong/@SoLuongNhan
+				    				SET @ChiSoTTNhanM = @ChiSoSLNhanM * CAST(@ThanhTienHoaDon AS BIGINT )/@SoLuong
+								END
+							ELSE
+								BEGIN
+									SET @ChiSoSLNhanM =  0
+				    				SET @ChiSoTTNhanM = CAST(@ThanhTienHoaDon AS BIGINT )/@SoLuongNhan
+								END
+						END
+				    
+				    ELSE 
+				    BEGIN
+				    	IF(@SoLuong <> 0)
+				    	    begin
+				    			SET @ChiSoSLNhanM =  @SoLuong - (@SoLuongNhan-1) * CAST(@SoLuong/@SoLuongNhan AS INT)
+				    			SET @ChiSoTTNhanM =  CAST(@ThanhTienHoaDon AS BIGINT) - (@SoLuongNhan-1) * CAST(@SoLuong/@SoLuongNhan AS INT) * CAST(@ThanhTienHoaDon AS BIGINT)/@SoLuong
+				    	    END
+				    	ELSE
+				    		BEGIN
+				    			SET @ChiSoSLNhanM =  0
+				    			SET @ChiSoTTNhanM =  CAST(@ThanhTienHoaDon AS BIGINT) - (@SoLuongNhan-1)  * CAST(@ThanhTienHoaDon AS BIGINT)/@SoLuongNhan
+				    		END
+				   
+				    	END 
+				    	
+				   SELECT @TenNhanHang = dnh.TenNhanHang, @DmListNganhHangREF = dnh.DmNghanhHangREF
+					  FROM DmNhanHang dnh
+					WHERE dnh.DmNhanHangID = @DmNhanHangREF
+					SET @TenNhanHang = ISNULL(@TenNhanHang,'')
+					SET @DmListNganhHangREF = ISNULL(@DmListNganhHangREF,'')
+					
+							--- Insert du lieu vao table DoanhSoTienVeNhanHangCore
+							INSERT INTO DoanhSoTienVeNhanHangCore
+							SELECT @NgayThucHien,
+								   @TenNhanHang,
+								   @DmNhanHangREF,
+								   '' AS DsTenNganhHang,
+								   @DmListNganhHangREF,
+								   @HopDongID,
+								   @SoHopDong,
+								   @NgayDanhSo,
+								   @NgayKyHopDong,
+								   
+								   @TenNhanVien,
+								   @DmNhanVienREF,
+								   @TenPhongBan,
+								   @PhongBanREF,
+								   @TenBoPhan,
+								   @BoPhanREF,
+								   @TenNhom,
+								   @NhomREF,
+								   @TenKhachHang,
+								   @DmKhachHangREF,
+								   @HopDongChiTietREF,
+								   @DmSanPhamREF,
+								   @TenSanPham,
+								   @TenWebsite,
+								   @DmWebsiteREF
+								   --SoLuongThucThu
+									, 0 SoLuongPhatSinhDauKy
+									, 0 SoLuongPhatSinhTrongKy
+									, 0 SoLuongPhatSinhCuoiKy
+									--SoLuongKM
+									, 0 SoLuongKMPhatSinhDauKy
+									, 0 SoLuongKMPhatSinhTrongKy
+									, 0 SoLuongKMPhatSinhCuoiKy
+									--SoLuongNB
+									, (
+										CASE WHEN @ChietKhau = 100 THEN 0
+											ELSE 0 	
+										END	
+									)SoLuongNBPhatSinhDauKy
+									, (
+										CASE WHEN @ChietKhau = 100 THEN 0
+											ELSE @ChiSoSLNhanM	END) SoLuongNBPhatSinhTrongKy
+									, (
+										CASE WHEN @ChietKhau = 100 THEN 0
+											ELSE   @ChiSoSLNhanM
+									  END	) SoLuongNBPhatSinhCuoiKy
+									, @DonViTinhREF
+									, @DonViTinh
+									, @TenDangNhap
+									, @DonGia
+									, @ChietKhau
+									--ThanhtienThucThu
+									, 0 ThanhTienPhatSinhDauKy
+									, 0 ThanhTienPhatSinhTrongKy
+									, 0 ThanhTienPhatSinhCuoiKy
+									--ThanhTienKM
+									, 0 ThanhTienKMPhatSinhDauKy
+									, 0 ThanhTienKMPhatSinhTrongKy
+									, 0 ThanhTienKMPhatSinhCuoiKy
+									--THanh tien noi bo
+									, (
+										CASE WHEN @ChietKhau = 100 THEN 0
+											ELSE 0 	
+										END	
+									)ThanhTienNBPhatSinhDauKy
+									, (
+										CASE WHEN @ChietKhau = 100 THEN 0
+											ELSE @ChiSoTTNhanM	END) ThanhTienNBPhatSinhTrongKy
+									, (
+										CASE WHEN @ChietKhau = 100 THEN 0
+											ELSE   @ChiSoTTNhanM
+									  END	) ThanhTienNBPhatSinhCuoiKy
+									  , @TrangThaiHopDong		
+										, N'Chay du lieu qua ky' DienGiai
+										, 'ASD' CreatedBy
+										, GETDATE() CreatedAt
+										, 'ASD' LastModifiedBy
+										, GETDATE() LastModifiedAt
+										, 0 RecordStatus
+										, 0 DeletedStatus
+										, 0 PrintStatus
+										, 3 TypeRecordStatus -- 0 La chay du lieu qua khu
+										
+										,@NgayThanhToan
+										,@ThongTinTienVeID
+										,@DmListNhanHangREF
+										,@DmMaSohopDong
+																  
+				   FETCH NEXT FROM Record_cursor2 INTO @DmNhanHangREF   
+			END   
+
+			CLOSE Record_cursor2   
+			DEALLOCATE Record_cursor2
+	END
+	ELSE
+		BEGIN
+			--- Insert du lieu vao table DoanhSoTienVeNhanHangCore
+							INSERT INTO DoanhSoTienVeNhanHangCore
+							SELECT @NgayThucHien,
+								   @TenNhanHang,
+								   @DmNhanHangREF,
+								   '' AS DsTenNganhHang,
+								   @DmListNganhHangREF,
+								   @HopDongID,
+								   @SoHopDong,
+								   @NgayDanhSo,
+								   @NgayKyHopDong,
+								   
+								   @TenNhanVien,
+								   @DmNhanVienREF,
+								   @TenPhongBan,
+								   @PhongBanREF,
+								   @TenBoPhan,
+								   @BoPhanREF,
+								   @TenNhom,
+								   @NhomREF,
+								   @TenKhachHang,
+								   @DmKhachHangREF,
+								   @HopDongChiTietREF,
+								   @DmSanPhamREF,
+								   @TenSanPham,
+								   @TenWebsite,
+								   @DmWebsiteREF
+								   --SoLuongThucThu
+									, 0 SoLuongPhatSinhDauKy
+									, 0 SoLuongPhatSinhTrongKy
+									, 0 SoLuongPhatSinhCuoiKy
+									--SoLuongKM
+									, 0 SoLuongKMPhatSinhDauKy
+									, 0 SoLuongKMPhatSinhTrongKy
+									, 0 SoLuongKMPhatSinhCuoiKy
+									--SoLuongNB
+									, (
+										CASE WHEN @ChietKhau = 100 THEN 0
+											ELSE 0 	
+										END	
+									)SoLuongNBPhatSinhDauKy
+									, (
+										CASE WHEN @ChietKhau = 100 THEN 0
+											ELSE @SoLuong	END) SoLuongNBPhatSinhTrongKy
+									, (
+										CASE WHEN @ChietKhau = 100 THEN 0
+											ELSE   @SoLuong
+									  END	) SoLuongNBPhatSinhCuoiKy
+									, @DonViTinhREF
+									, @DonViTinh
+									, @TenDangNhap
+									, @DonGia
+									, @ChietKhau
+									--ThanhtienThucThu
+									, 0 ThanhTienPhatSinhDauKy
+									, 0 ThanhTienPhatSinhTrongKy
+									, 0 ThanhTienPhatSinhCuoiKy
+									--ThanhTienKM
+									, 0 ThanhTienKMPhatSinhDauKy
+									, 0 ThanhTienKMPhatSinhTrongKy
+									, 0 ThanhTienKMPhatSinhCuoiKy
+									--SoLuongNB
+									, (
+										CASE WHEN @ChietKhau = 100 THEN 0
+											ELSE 0 	
+										END	
+									)ThanhTienNBPhatSinhDauKy
+									, (
+										CASE WHEN @ChietKhau = 100 THEN 0
+											ELSE @ThanhTienHoaDon	END) ThanhTienNBPhatSinhTrongKy
+									, (
+										CASE WHEN @ChietKhau = 100 THEN 0
+											ELSE   @ThanhTienHoaDon
+									  END	) ThanhTienNBPhatSinhCuoiKy
+									  , @TrangThaiHopDong		
+										, N'Chay du lieu qua ky' DienGiai
+										, 'ASD' CreatedBy
+										, GETDATE() CreatedAt
+										, 'ASD' LastModifiedBy
+										, GETDATE() LastModifiedAt
+										, 0 RecordStatus
+										, 0 DeletedStatus
+										, 0 PrintStatus
+										, 3 TypeRecordStatus -- 0 La chay du lieu qua khu
+										
+										,@NgayThanhToan
+										,@ThongTinTienVeID
+										,@DmListNhanHangREF
+										,@DmMaSohopDong
+		END
+
+   FETCH NEXT FROM Record_cursor1 INTO @DsTenNhanHang, @DmListNhanHangREF,@DsTenNganhHang , @DmListNganhHangREF 
+	,@HopDongID  ,@SoHopDong, @NgayDanhSo, @NgayKyHopDong , @TenNhanVien , @DmNhanVienREF , @TenPhongBan, @PhongBanREF 
+	, @TenBoPhan , @BoPhanREF , @TenNhom , @NhomREF , @TenKhachHang ,@DmKhachHangREF 
+	, @HopDongChiTietREF , @TenSanPham , @DmSanPhamREF , @TenWebsite , @DmWebsiteREF 
+	, @DonViTinhREF , @DonViTinh,@TenDangNhap,@ChietKhau , @DonGia , @SoLuong , @ThanhTien ,@TrangThaiHopDong 
+	,@NgayThanhToan,@ThongTinTienVeID,@DmMaSohopDong
+	
+	END   
+	CLOSE Record_cursor1   
+	DEALLOCATE Record_cursor1
+END
+
+```

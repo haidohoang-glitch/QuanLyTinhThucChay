@@ -1,0 +1,143 @@
+# Stored Procedure: `sp_TC_ExcInsertThucChayDaTinh_Single_Mobile_TinhLaiCuoiThang`
+
+- **Loại**: SQL_STORED_PROCEDURE
+- **Ngày tạo**: 2017-09-13 09:19:57.310000
+- **Ngày sửa cuối**: 2017-09-13 09:19:57.310000
+
+## Parameters
+
+| Parameter | Type | Output |
+|-----------|------|--------|
+| `@DmBannerID` | `int(4)` | No |
+| `@NgayThucHien` | `datetime(8)` | No |
+| `@SoHopDong` | `nvarchar(100)` | No |
+| `@DmWebsiteID` | `int(4)` | No |
+
+## Definition (Source Code)
+
+```sql
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date,,>
+-- Description:	<Description,,>
+-- =============================================
+/*
+exec [dbo].[sp_TC_ExcInsertThucChayDaTinh_Single_Mobile] 519390, '2017-06-03', 'QC0190617', 105
+*/
+CREATE PROCEDURE [dbo].[sp_TC_ExcInsertThucChayDaTinh_Single_Mobile_TinhLaiCuoiThang]
+	-- Add the parameters for the stored procedure here
+    @DmBannerID INT ,
+    @NgayThucHien DATETIME ,
+    @SoHopDong NVARCHAR(50) ,
+    @DmWebsiteID INT
+AS
+    BEGIN
+        DECLARE @ProductUnitName NVARCHAR(50) ,
+            @BannerType INT ,
+            @TenWebsite NVARCHAR(50) ,
+            @HopDongChiTietREF INT ,
+            @TypeProduct INT ,
+            @TongViewThucChay INT ,
+            @TongClickThucChay INT ,
+            @DmBannerREF INT
+			
+
+        DECLARE @HopDongChiTietID INT
+		
+        DECLARE icursor CURSOR
+        FOR
+            SELECT DISTINCT
+                    hdct.HopDongChiTietID
+            FROM    ThucChayHopDongChiTietAndBanner tc
+                    INNER JOIN HopDongChiTiet hdct ON tc.HopDongChiTietREF = hdct.HopDongChiTietID
+                    INNER JOIN HopDong hd ON tc.HopDongREF = hd.HopDongID
+            WHERE   CONVERT(NVARCHAR(50), tc.DmBannerID) = CONVERT(NVARCHAR(50), @DmBannerID)
+                    AND hd.SoHopDong = @SoHopDong
+            ORDER BY hdct.HopDongChiTietID
+		
+        OPEN icursor  
+		
+        FETCH NEXT FROM icursor   
+		INTO @HopDongChiTietID
+		
+        WHILE @@FETCH_STATUS = 0
+            BEGIN  
+		    
+				
+                --Delete truoc khi tinh
+                --DELETE  FROM ThucChayDaTinhMobile
+                --WHERE   HopDongChiTietREF = @HopDongChiTietID
+                --        AND DmSanPhamREF = 342
+                --        AND NgayThucHien = @NgayThucHien
+                --        AND DmBannerREF = @DmBannerID
+                --        AND DmWebsiteREF = @DmWebsiteID
+	
+                DECLARE Record_Cursor CURSOR
+                FOR
+                    SELECT  A.SoHopDong ,
+                            A.TenWebsite ,
+                            @HopDongChiTietID ,
+                            A.TypeProduct ,
+                            A.ProductUnitName ,
+                            A.BannerType ,
+                            A.DmBannerREF ,
+                            ISNULL(SUM(A.TongViewThucChay), 0) TongViewThucChay ,
+                            ISNULL(SUM(A.TongClickThucChay), 0) TongClickThucChay
+                    FROM    ThucChay_MobileTemp A
+                    WHERE   1 = 1
+                            AND A.NgayThucHien = @NgayThucHien
+                            AND A.DmBannerREF = @DmBannerID
+                            AND A.SoHopDong = @SoHopDong
+                            AND A.DmWebsiteREF = @DmWebsiteID
+                    GROUP BY A.SoHopDong ,
+                            A.TenWebsite ,
+                            A.ProductUnitName ,
+                            A.HopDongChiTietREF ,
+                            A.TypeProduct ,
+                            A.ProductUnitName ,
+                            A.BannerType ,
+                            A.DmBannerREF
+	
+                OPEN Record_Cursor
+
+		-- Perform the first fetch.
+                FETCH NEXT FROM Record_Cursor INTO @SoHopDong, @TenWebsite,
+                    @HopDongChiTietREF, @TypeProduct, @ProductUnitName,
+                    @BannerType, @DmBannerREF, @TongViewThucChay,
+                    @TongClickThucChay			
+                WHILE @@FETCH_STATUS = 0
+                    BEGIN			
+					
+
+						
+																				  			
+                        EXEC sp_TC_InsertThucChayDaTinh_Mobile_TinhLaiCuoiThang @NgayThucHien,
+                            @SoHopDong, @TenWebsite, @HopDongChiTietREF,
+                            @TypeProduct, @ProductUnitName, @BannerType,
+                            @DmBannerREF, @TongViewThucChay,
+                            @TongClickThucChay		
+					
+																								
+                        FETCH NEXT FROM Record_Cursor INTO @SoHopDong,
+                            @TenWebsite, @HopDongChiTietREF, @TypeProduct,
+                            @ProductUnitName, @BannerType, @DmBannerREF,
+                            @TongViewThucChay, @TongClickThucChay
+                    END
+
+                CLOSE Record_Cursor
+                DEALLOCATE Record_Cursor
+
+			 
+                FETCH NEXT FROM icursor   
+		    INTO @HopDongChiTietID 
+            END   
+        CLOSE icursor;  
+        DEALLOCATE icursor;  
+
+
+	
+			 
+			
+    END
+
+```

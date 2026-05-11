@@ -1,0 +1,30 @@
+# Table: `ThucChayMuaNgoaiChiTietLog`
+
+---
+
+## Columns
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `ThucChayMuaNgoaiChiTietLogID` | `INT` NN IDENTITY |  |
+| `ThucChayMuaNgoaiChiTietREF` | `INT` NN |  |
+| `HopDongREF` | `INT` NN |  |
+| `HopDongChiTietREF` | `INT` NN |  |
+| `TuNgay` | `DATETIME` nullable |  |
+| `DenNgay` | `DATETIME` nullable |  |
+| `NgayThucChay` | `DATETIME` nullable |  |
+| `SoLuongThucChay` | `FLOAT` nullable |  |
+| `DmDonViTinhREF` | `INT` nullable |  |
+| `ChietKhauMuaNgoai` | `FLOAT` nullable |  |
+| `ThanhTienMuaNgoaiTruocCK` | `FLOAT` nullable |  |
+| `ThanhTienThucChayBanSauCK` | `FLOAT` nullable |  |
+| `ThanhTienLaiThucChaySauCK` | `FLOAT` nullable |  |
+| `CreatedAt` | `DATETIME` nullable |  |
+| `CreatedBy` | `NVARCHAR(50)` nullable |  |
+| `LastModifiedAt` | `DATETIME` nullable |  |
+| `LastModifiedBy` | `NVARCHAR(50)` nullable |  |
+| `Status` | `SMALLINT` nullable |  |
+| `DeletedStatus` | `SMALLINT` nullable |  |
+| `LogTime` | `DATETIME` nullable |  |
+| `LogStatus` | `SMALLINT` nullable |  |
+| `TrangThaiTinhThucChay` | `SMALLINT` nullable |  |

@@ -1,0 +1,172 @@
+# Stored Procedure: `ThucChay_GetSumFilterCondition_Label`
+
+- **Loại**: SQL_STORED_PROCEDURE
+- **Ngày tạo**: 2014-04-23 11:12:44.573000
+- **Ngày sửa cuối**: 2014-11-19 12:16:54.077000
+
+## Parameters
+
+| Parameter | Type | Output |
+|-----------|------|--------|
+| `@PageIndex` | `int(4)` | No |
+| `@RecordCount` | `int(4)` | No |
+| `@GroupFieldName` | `nvarchar(100)` | No |
+| `@StartDate` | `datetime(8)` | No |
+| `@EndDate` | `datetime(8)` | No |
+| `@DmSanPhamREFList` | `nvarchar(8000)` | No |
+| `@DmWebsiteREFList` | `nvarchar(8000)` | No |
+| `@SoHopDongList` | `nvarchar(8000)` | No |
+| `@DmPhongBanREFList` | `nvarchar(8000)` | No |
+| `@DmBoPhanREFList` | `nvarchar(8000)` | No |
+| `@DmNhomLamViecREFList` | `nvarchar(8000)` | No |
+| `@TenNhanVienList` | `nvarchar(8000)` | No |
+| `@TenDangNhap` | `nvarchar(100)` | No |
+| `@DmHinhThucQuangCaoList` | `nvarchar(400)` | No |
+| `@DmBannerREFList` | `nvarchar(400)` | No |
+| `@TenNhanHangList` | `nvarchar(4000)` | No |
+
+## Definition (Source Code)
+
+```sql
+-- =============================================
+-- Author:		NhatMQ
+-- Modified date: 2013-09-02
+-- Description:	ThucChay_GetSumFilterCondition 
+-- =============================================
+CREATE PROCEDURE [dbo].[ThucChay_GetSumFilterCondition_Label]     
+    @PageIndex INT = 1,
+	@RecordCount INT = 10,
+	@GroupFieldName nvarchar(50),
+	@StartDate datetime,
+	@EndDate datetime,
+	@DmSanPhamREFList nvarchar(4000),
+	@DmWebsiteREFList nvarchar(4000),
+	@SoHopDongList nvarchar(4000),
+	@DmPhongBanREFList nvarchar(4000),
+	@DmBoPhanREFList nvarchar(4000),
+	@DmNhomLamViecREFList nvarchar(4000),
+	@TenNhanVienList nvarchar(4000),
+	@TenDangNhap nvarchar(50),
+	@DmHinhThucQuangCaoList NVARCHAR(200),
+	@DmBannerREFList NVARCHAR(200),
+	@TenNhanHangList NVARCHAR(2000)		
+AS
+BEGIN
+    -- SET NOCOUNT ON added to prevent extra result sets from
+    -- interfering with SELECT statements.
+    SET NOCOUNT ON;
+    --Select
+    
+    DECLARE @Sql NVARCHAR(MAX);
+    DECLARE @DauNhay NVARCHAR(50);
+    Declare @GroupByFildID nvarchar(4000);
+	Declare @GroupByFild nvarchar(4000);
+	Declare @FilterString nvarchar(4000);
+	DECLARE @GroupPermission INT;
+	DECLARE @PhongID INT, @BoPhanID INT, @NhomLamViecID INT, @ChucDanhID INT
+	DECLARE @TuNgay DATETIME, @DenNgay DATETIME	
+	DECLARE @MinDate DATETIME, @MaxDate DATETIME
+	DECLARE @SqlCommand VARCHAR(MAX);
+	DECLARE @Count INT
+	SET @DauNhay =''''
+	
+	DECLARE @Pamrams NVARCHAR(MAX);
+	SET @Pamrams = N'@PageIndexParam int,
+					@RecordCountParam int,
+					@GroupFieldNameParam nvarchar(50), 
+					@StartDateParam datetime,
+					@EndDateParam datetime, 
+					@DmSanPhamREFListParam nvarchar(4000), 
+					@DmWebsiteREFListParam nvarchar(4000), 
+					@SoHopDongListParam nvarchar(4000), 
+					@DmPhongBanREFListParam nvarchar(4000), 
+					@DmBoPhanREFListParam nvarchar(4000), 
+					@DmNhomLamViecREFListParam nvarchar(4000), 
+					@TenNhanVienListParam nvarchar(4000),
+					@TenDangNhapParam nvarchar(50), 
+					@DmHinhThucQuangCaoListParam NVARCHAR(200), 
+					@DmBannerREFListParam NVARCHAR(200), 
+					@TenNhanHangListParam NVARCHAR(2000)'
+	
+	SET @FilterString = dbo.GetThucChayLabelFilterString(@StartDate,
+												@EndDate,
+												@DmSanPhamREFList ,
+												@DmWebsiteREFList ,
+												@SoHopDongList ,
+												@DmPhongBanREFList ,
+												@DmBoPhanREFList ,
+												@DmNhomLamViecREFList ,
+												@TenNhanVienList,
+												@TenDangNhap,
+												@PhongID,
+												@BoPhanID,
+												@NhomLamViecID,
+												@ChucDanhID,
+												@DmHinhThucQuangCaoList,
+												@DmBannerREFList,
+												@TenNhanHangList)
+												
+	PRINT @FilterString;												
+	
+	SET @Sql = '
+SELECT 
+	GroupFieldName, GiaTriThayDoi,
+	ThanhTienNoiBo, ThanhTienKhuyenMai, ThanhTienThucThu
+FROM
+(
+	SELECT
+		GroupFieldName,
+		SUM(GiaTriThayDoi) GiaTriThayDoi,				
+		SUM(ThanhTienNoiBo) ThanhTienNoiBo,
+		SUM(ThanhTienKhuyenMai) ThanhTienKhuyenMai,
+		SUM(ThanhTienThucThu + GiaTriThayDoi) ThanhTienThucThu,
+		ROW_NUMBER() OVER (ORDER BY (A.GroupFieldName) ASC) AS num
+	FROM
+	(
+		SELECT 
+			hd.NhanHopDong GroupFieldName,
+			SUM(tcdt.GiaTriThayDoi) GiaTriThayDoi,					
+			CASE WHEN (UPPER(tcdt.TenMaHopDong) LIKE ' + @DauNhay + 'NB%' + @DauNhay + ' OR UPPER(tcdt.TenMaHopDong) LIKE ' 
++ @DauNhay + '%SH%' + @DauNhay + ' OR UPPER(tcdt.TenMaHopDong) LIKE ' + @DauNhay + '%SOHA%' + @DauNhay + ') THEN 
+					ISNULL(SUM(tcdt.ThanhTienSauTrietKhauThucChay),0) 
+				ELSE 0
+			END AS ThanhTienNoiBo,
+			ISNULL(SUM(tcdt.ThanhTienKM),0) AS ThanhTienKhuyenMai,			
+			CASE WHEN (UPPER(tcdt.TenMaHopDong) NOT LIKE ' + @DauNhay + 'NB%' + @DauNhay + ' AND UPPER(tcdt.TenMaHopDong) 
+NOT LIKE ' + @DauNhay + '%SH%' + @DauNhay + ' AND UPPER(tcdt.TenMaHopDong) NOT LIKE ' + @DauNhay + '%SOHA%' + @DauNhay + ')  THEN 
+					ISNULL(SUM(tcdt.ThanhTienSauTrietKhauThucChay),0) 
+				ELSE 0
+			END AS ThanhTienThucThu
+		FROM ThucChayDaTinh tcdt													
+                      
+			INNER JOIN HopDong hd ON tcdt.HopDongID = hd.HopDongID
+		WHERE ' + @FilterString + '
+		GROUP BY hd.NhanHopDong, tcdt.TenMaHopDong, tcdt.ThanhTienKM
+	)A
+	GROUP BY GroupFieldName
+)T
+WHERE T.num BETWEEN ' + CONVERT(NVARCHAR(20),((@PageIndex-1)*@RecordCount + 1)) + ' AND ' + CONVERT(NVARCHAR(20),
+(@PageIndex*@RecordCount)) 
+	
+	PRINT @Sql;
+	
+	EXECUTE sp_executesql @Sql, @Pamrams, 
+		@PageIndexParam					= @PageIndex,
+		@RecordCountParam				= @RecordCount,
+		@GroupFieldNameParam			= @GroupFieldName,
+		@StartDateParam					= @StartDate,
+		@EndDateParam					= @EndDate,
+		@DmSanPhamREFListParam			= @DmSanPhamREFList,
+		@DmWebsiteREFListParam			= @DmWebsiteREFList,
+		@SoHopDongListParam				= @SoHopDongList,
+		@DmPhongBanREFListParam			= @DmPhongBanREFList,
+		@DmBoPhanREFListParam			= @DmBoPhanREFList,
+		@DmNhomLamViecREFListParam		= @DmNhomLamViecREFList,
+		@TenNhanVienListParam			= @TenNhanVienList,
+		@TenDangNhapParam				= @TenDangNhap,
+		@DmHinhThucQuangCaoListParam	= @DmHinhThucQuangCaoList,
+		@DmBannerREFListParam			= @DmBannerREFList,
+		@TenNhanHangListParam			= @TenNhanHangList	
+END
+
+```

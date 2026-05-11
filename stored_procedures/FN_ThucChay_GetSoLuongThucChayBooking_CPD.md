@@ -1,0 +1,124 @@
+# Function: `ThucChay_GetSoLuongThucChayBooking_CPD`
+
+- **Loại**: SQL_SCALAR_FUNCTION
+- **Ngày tạo**: 2013-11-08 16:52:07.890000
+- **Ngày sửa cuối**: 2014-10-14 10:39:31.140000
+
+## Parameters
+
+| Parameter | Type | Output |
+|-----------|------|--------|
+| `(Return Value)` | `float(8)` | Yes |
+| `@SoLuong` | `int(4)` | No |
+| `@DonViTinh` | `nvarchar(100)` | No |
+| `@HopDongChiTietID` | `nvarchar(100)` | No |
+| `@NgayThucHien` | `datetime(8)` | No |
+
+## Definition (Source Code)
+
+```sql
+-- =============================================
+-- Author:		<Author,,Name>
+-- Create date: <Create Date, ,>
+-- Description:	<Description, ,>
+-- =============================================
+CREATE  FUNCTION [dbo].[ThucChay_GetSoLuongThucChayBooking_CPD]
+(
+	-- Add the parameters for the function here
+	@SoLuong INT, 
+	@DonViTinh nvarchar(50),
+	@HopDongChiTietID NVARCHAR(50),
+	@NgayThucHien DATETIME
+)
+RETURNS FLOAT
+AS
+BEGIN
+	-- Declare the return variable here
+	DECLARE @SoLuongTheoDonViTinh FLOAT
+	DECLARE @SoNgayTheoDonViTinh INT
+	DECLARE @Count INT 
+	SET @DonViTinh = UPPER(LTRIM(RTRIM(@DonViTinh)))
+	
+	IF(@DonViTinh = 'CPM' or @DonViTinh = 'CPC')
+	BEGIN
+		SET @SoLuongTheoDonViTinh = @SoLuong*1000
+	END
+	ELSE
+		IF(@DonViTinh = N'BÀI')
+		BEGIN
+			SET @SoLuongTheoDonViTinh = @SoLuong
+		END
+		ELSE
+			IF(@DonViTinh = 'GOI')
+			BEGIN
+				SET @SoLuongTheoDonViTinh = 5000
+				SET @SoLuongTheoDonViTinh = @SoLuong
+			END
+			ELSE			
+			BEGIN
+				SET @Count =
+				(
+					SELECT COUNT(*) FROM HopDongChiTiet hdct
+					WHERE dbo.FormatString(hdct.HopDongChiTietID) = @HopDongChiTietID
+					AND hdct.DmLoaiBannerREF = 5	--Doc quyen
+					AND hdct.DeletedStatus = 0
+				)
+				IF(@Count > 0)
+					BEGIN
+						SET @SoNgayTheoDonViTinh = 
+						(
+							SELECT distinct ISNULL(DATEDIFF(day, b.NgayBatDau, b.NgayKetThuc) + 1,0)
+							FROM DotChayHopDongChiTiet dchdct
+							INNER JOIN
+							( 
+								SELECT b.BookingID,b.NgayBatDau
+								, (
+									CASE WHEN convert(date,b.NgayKetThuc) > @NgayThucHien THEN @NgayThucHien
+										ELSE b.NgayKetThuc
+									END
+								   )AS NgayKetThuc
+								   , b.[Status], b.HinhThucSP
+								FROM Booking b
+								WHERE b.[Status] IN (3,5)
+								AND b.HinhThucSP = 1
+								AND b.DeletedStatus = 0
+							) B ON b.BookingID = dchdct.BookingREF
+							AND dbo.FormatString(dchdct.HopDongChiTietREF) = @HopDongChiTietID
+							AND dchdct.RecordStatus = 0
+							AND dchdct.DeletedStatus = 0
+						)
+					END
+				ELSE
+					BEGIN
+						SET @SoNgayTheoDonViTinh = 
+						(
+							SELECT ISNULL(sum(DATEDIFF(day, b.NgayBatDau, b.NgayKetThuc) + 1),0)
+							FROM DotChayHopDongChiTiet dchdct
+							INNER JOIN 
+							( 
+								SELECT b.BookingID,b.NgayBatDau
+								, (
+									CASE WHEN convert(date,b.NgayKetThuc) > @NgayThucHien THEN @NgayThucHien
+										ELSE b.NgayKetThuc
+									END
+								   )AS NgayKetThuc
+								   , b.[Status], b.HinhThucSP
+								FROM Booking b
+								WHERE b.[Status] IN (3,5)
+								AND b.HinhThucSP = 1
+								AND b.DeletedStatus = 0
+							) B ON b.BookingID = dchdct.BookingREF
+							AND dbo.FormatString(dchdct.HopDongChiTietREF) = @HopDongChiTietID
+							AND dchdct.RecordStatus = 0
+							AND dchdct.DeletedStatus = 0
+
+						)		
+					END	
+				SET @SoLuongTheoDonViTinh = @SoNgayTheoDonViTinh
+			END
+	-- Return the result of the function
+	RETURN @SoLuongTheoDonViTinh
+
+END
+
+```
