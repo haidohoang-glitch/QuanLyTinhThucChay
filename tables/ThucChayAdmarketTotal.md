@@ -15,9 +15,7 @@
 | `TongTienThucChay` | `FLOAT` nullable |  |
 | `TongTienKhuyenMai` | `FLOAT` nullable |  |
 | `GhiChu` | `NVARCHAR(255)` nullable |  |
-| `DataType` | `INT` nullable | =1: Theo Domain;
-=2: Theo HopDong;
-=3: Theo Sale; |
+| `DataType` | `INT` nullable | =1: Theo Domain;<br>=2: Theo HopDong;<br>=3: Theo Sale; |
 | `CreatedBy` | `NVARCHAR(50)` NN |  |
 | `CreatedAt` | `DATETIME` NN |  |
 | `LastModifiedBy` | `NVARCHAR(50)` NN |  |

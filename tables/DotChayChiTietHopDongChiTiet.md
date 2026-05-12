@@ -9,7 +9,7 @@
 | `DotChayChiTietHopDongChiTietID` | `INT` PK | ID primary key của table DotChayHopDongChiTietThayDoi |
 | `DotChayHopDongChitietREF` | `INT` NN | ID Foreign key từ table DotChayHopDongChiTiet (DotChayHopDongChiTietID) |
 | `BookingREF` | `INT` NN | ID Của Booking |
-| `SoLuong` | `FLOAT` nullable | Số lượng đợt chạy  |
+| `SoLuong` | `FLOAT` nullable | Số lượng đợt chạy |
 | `ThoiGianBatDau` | `DATETIME` nullable | Ngày bắt đầu |
 | `ThoiGianKetThuc` | `DATETIME` nullable | Ngày kết thúc |
 | `VungMienID` | `INT` nullable | ID Vùng miền từ table VungMien |

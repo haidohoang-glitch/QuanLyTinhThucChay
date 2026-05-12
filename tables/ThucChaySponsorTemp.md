@@ -20,8 +20,7 @@
 | `TotalView` | `BIGINT` nullable |  |
 | `TotalClick` | `BIGINT` nullable |  |
 | `UnitID` | `INT` nullable |  |
-| `UnitName` | `NVARCHAR(50)` nullable | 1: Click
-2: View |
+| `UnitName` | `NVARCHAR(50)` nullable | 1: Click<br>2: View |
 | `Activate` | `DATETIME` nullable |  |
 | `Expire` | `DATETIME` nullable |  |
 | `UserName` | `NVARCHAR(50)` nullable |  |

@@ -30,7 +30,7 @@
 | `TenNhanVien` | `NVARCHAR(100)` nullable | Tên nhân viên sale |
 | `NgayDanhSoHopDong` | `DATETIME` nullable | Ngày đánh số hợp đồng |
 | `NganhHang` | `NVARCHAR(1000)` nullable | Ngành hàng |
-| `DmNhomREF` | `INT` nullable | ID foreign key từ table DmNhom  |
+| `DmNhomREF` | `INT` nullable | ID foreign key từ table DmNhom |
 | `TrangThaiHopDong` | `INT` nullable | Trạng thái của hợp đồng |
 | `IsBanCung` | `INT` nullable |  |
 | `CongNo` | `FLOAT` nullable |  |

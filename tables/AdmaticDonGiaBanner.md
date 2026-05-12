@@ -8,24 +8,10 @@
 |--------|------|-------------|
 | `AdmaticDonGiaBannerID` | `INT` NN IDENTITY |  |
 | `AdmaticBannerID` | `INT` nullable | Banner core cua Admatic |
-| `AdmaticProductID` | `INT` nullable | TYPEPRODUCT
--- 1: Adx Mobile
--- 2: Admicro AdExchange Adx
--- 3: adx Ecom
--- 4: Adx CTA
--- 5: Admarket CPC
--- 6: CPM kingsize
--- 7: CPM Stick
--- 8: TVC Online
--- 9: Balloon
---10: BrandPage
---11: Mobile |
+| `AdmaticProductID` | `INT` nullable | TYPEPRODUCT<br>-- 1: Adx Mobile<br>-- 2: Admicro AdExchange Adx<br>-- 3: adx Ecom<br>-- 4: Adx CTA<br>-- 5: Admarket CPC<br>-- 6: CPM kingsize<br>-- 7: CPM Stick<br>-- 8: TVC Online<br>-- 9: Balloon<br>--10: BrandPage<br>--11: Mobile |
 | `DmBannerID` | `INT` nullable | Banner cua san pham core |
 | `DonGiaBanner_VAT` | `FLOAT` nullable | Don gia banner da bao gom VAT |
-| `LoaiDonGiaTheoDVT` | `INT` nullable | Loai don gia theo don vi tinh:
---1: CPC
---2: CPM
---3: CPM |
+| `LoaiDonGiaTheoDVT` | `INT` nullable | Loai don gia theo don vi tinh:<br>--1: CPC<br>--2: CPM<br>--3: CPM |
 | `BannerDateCreate` | `DATETIME` nullable |  |
 | `CreatedAt` | `DATETIME` nullable |  |
 | `CreatedBy` | `NVARCHAR(50)` nullable |  |

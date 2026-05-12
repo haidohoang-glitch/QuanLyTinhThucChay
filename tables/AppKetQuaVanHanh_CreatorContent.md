@@ -30,13 +30,7 @@
 | `VAT` | `DECIMAL(8,2)` nullable |  |
 | `TienThanhToan` | `DECIMAL(18,2)` nullable |  |
 | `LaiLo` | `DECIMAL(18,2)` nullable |  |
-| `TrangThai` | `TINYINT` nullable | 1- Mới
-2- Gửi duyệt (gửi leader duyệt)
-3- Duyệt KQVH (leader duyệt)
-4- Từ chối duyệt TC
-5- Gửi duyệt TT: Gửi kế toán duyệt TT
-6- Duyệt TT: Kế toán duyệt TT
-7- Từ chối duyệt TT |
+| `TrangThai` | `TINYINT` nullable | 1- Mới<br>2- Gửi duyệt (gửi leader duyệt)<br>3- Duyệt KQVH (leader duyệt)<br>4- Từ chối duyệt TC<br>5- Gửi duyệt TT: Gửi kế toán duyệt TT<br>6- Duyệt TT: Kế toán duyệt TT<br>7- Từ chối duyệt TT |
 | `NguoiDuyet` | `INT` nullable |  |
 | `NguoiDuyetTen` | `NVARCHAR(250)` nullable |  |
 | `NgayDuyet` | `DATETIME` nullable |  |
