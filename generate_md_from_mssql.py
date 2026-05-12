@@ -1,7 +1,7 @@
 """
 generate_md_from_mssql.py
 --------------------------
-Kết nối vào SQL Server, đọc schema thật (bảng, cột, index, FK),
+Kết nối vào SQL Server, đọc schema thật lấy thông tin table (bảng, cột, index, FK),
 rồi sinh ra bộ file .md theo đúng cấu trúc dự án này:
 
     output_dir/
